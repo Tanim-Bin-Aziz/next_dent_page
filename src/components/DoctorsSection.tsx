@@ -18,7 +18,7 @@ const doctors = [
   {
     id: 2,
     name: "Dr. Nazia",
-    specialty: "Pediatric Dentist",
+    specialty: "Endodontist",
     hospital: "NextDent |  Dhaka Dental College",
     image:
       "https://images.unsplash.com/photo-1594824476967-48c8b964273f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
