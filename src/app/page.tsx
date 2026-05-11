@@ -1,6 +1,7 @@
 import DoctorsSection from "@/components/DoctorsSection";
 import HeroSection from "@/components/HeroSection";
 import Navbar from "@/components/Navbar";
+import ServicesSection from "@/components/ServicesSection";
 import StatsSection from "@/components/StatsSection";
 
 const Home = () => {
@@ -10,6 +11,7 @@ const Home = () => {
       <HeroSection />
       <StatsSection />
       <DoctorsSection />
+      <ServicesSection />
     </>
   );
 };

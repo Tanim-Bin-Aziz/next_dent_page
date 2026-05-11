@@ -65,7 +65,7 @@ const DoctorsSection = () => {
         >
           <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-black">
             Our Expert{" "}
-            <span className="bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
+            <span className="bg-[#37c4b2] bg-clip-text text-transparent">
               Doctors
             </span>
           </h2>
@@ -103,7 +103,8 @@ const DoctorsSection = () => {
                 border-black/5
                 bg-white/60
                 backdrop-blur-2xl
-                shadow-[0_8px_30px_rgba(0,0,0,0.08)]
+                shadow-lg
+                shadow-[#37c4b2]/20
                 transition-all
                 duration-300
                 hover:-translate-y-1
@@ -136,9 +137,9 @@ const DoctorsSection = () => {
 
                 {/* Specialty */}
                 <div className="mt-2 flex items-center gap-2">
-                  <Stethoscope className="h-4 w-4 shrink-0 text-cyan-600" />
+                  <Stethoscope className="h-4 w-4 shrink-0 text-[#37c4b2]" />
 
-                  <p className="text-sm font-medium text-cyan-700">
+                  <p className="text-sm font-medium text-[#37c4b2] line-clamp-2">
                     {doctor.specialty}
                   </p>
                 </div>
