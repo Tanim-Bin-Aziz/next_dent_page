@@ -45,6 +45,7 @@ const Navbar = () => {
             rounded-[28px]
             border border-black/10
             backdrop-blur-2xl
+            shadow-lg
             transition-all duration-500
             ${
               isScrolled
@@ -72,21 +73,27 @@ const Navbar = () => {
                     onClick={() =>
                       handleScrollToSection(link.path.replace("#", ""))
                     }
-                    className="text-sm font-medium text-black/70 hover:text-[#37c4b2] transition"
+                    className="relative text-sm font-medium text-black/70 hover:text-[#37c4b2] transition group"
                   >
                     {link.name}
+
+                    {/* UNDERLINE */}
+                    <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-[#37c4b2] rounded-full transition-all duration-300 group-hover:w-full"></span>
                   </button>
                 ) : (
                   <Link
                     key={link.name}
                     href={link.path}
-                    className={`text-sm font-medium transition ${
+                    className={`relative text-sm font-medium transition group ${
                       pathname === link.path
                         ? "text-[#37c4b2]"
                         : "text-black/70 hover:text-[#37c4b2]"
                     }`}
                   >
                     {link.name}
+
+                    {/* UNDERLINE */}
+                    <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-[#37c4b2] rounded-full transition-all duration-300 group-hover:w-full"></span>
                   </Link>
                 );
               })}
@@ -103,7 +110,7 @@ const Navbar = () => {
               </Link>
             </div>
 
-            {/* Mobile Icon (BLACK FIXED) */}
+            {/* Mobile Icon */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="md:hidden w-11 h-11 rounded-xl border border-black/10 bg-white/40 backdrop-blur-xl flex items-center justify-center text-black"
@@ -122,48 +129,67 @@ const Navbar = () => {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed top-24 left-1/2 -translate-x-1/2 z-40 w-[92%] md:hidden"
+            initial={{
+              opacity: 0,
+              y: -10,
+              backdropFilter: "blur(0px)",
+              backgroundColor: "rgba(255,255,255,0)",
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              backdropFilter: "blur(20px)",
+              backgroundColor: "rgba(255,255,255,0.55)",
+            }}
+            exit={{
+              opacity: 0,
+              y: -10,
+              backdropFilter: "blur(0px)",
+              backgroundColor: "rgba(255,255,255,0)",
+            }}
+            transition={{ duration: 0.35, ease: "easeInOut" }}
+            className="fixed top-24 left-1/2 -translate-x-1/2 z-40 w-[92%] md:hidden rounded-[24px] border border-black/10 shadow-xl overflow-hidden"
           >
-            <div className="rounded-[24px] border border-black/10 bg-white/60 backdrop-blur-2xl shadow-xl">
-              <div className="flex flex-col p-5 gap-2">
-                {navLinks.map((link, i) => {
-                  const isHash = link.path.startsWith("#");
+            <div className="flex flex-col p-5 gap-2">
+              {navLinks.map((link, i) => {
+                const isHash = link.path.startsWith("#");
 
-                  return (
-                    <div key={i}>
-                      {isHash ? (
-                        <button
-                          onClick={() =>
-                            handleScrollToSection(link.path.replace("#", ""))
-                          }
-                          className="w-full text-left px-4 py-3 rounded-xl text-black/70 hover:bg-white/40 hover:text-[#37c4b2]"
-                        >
-                          {link.name}
-                        </button>
-                      ) : (
-                        <Link
-                          href={link.path}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="block px-4 py-3 rounded-xl text-black/70 hover:bg-white/40 hover:text-[#37c4b2]"
-                        >
-                          {link.name}
-                        </Link>
-                      )}
-                    </div>
-                  );
-                })}
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                  >
+                    {isHash ? (
+                      <button
+                        onClick={() =>
+                          handleScrollToSection(link.path.replace("#", ""))
+                        }
+                        className="w-full text-left px-4 py-3 rounded-xl text-black/70 hover:text-[#37c4b2] hover:bg-white/30 transition"
+                      >
+                        {link.name}
+                      </button>
+                    ) : (
+                      <Link
+                        href={link.path}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="block px-4 py-3 rounded-xl text-black/70 hover:text-[#37c4b2] hover:bg-white/30 transition"
+                      >
+                        {link.name}
+                      </Link>
+                    )}
+                  </motion.div>
+                );
+              })}
 
-                <Link
-                  href="/contact"
-                  className="mt-3 flex items-center justify-center gap-2 rounded-full bg-[#37c4b2] px-5 py-3 text-white"
-                >
-                  <Calendar className="w-5 h-5 text-white" />
-                  Book Appointment
-                </Link>
-              </div>
+              <Link
+                href="/contact"
+                className="mt-3 flex items-center justify-center gap-2 rounded-full bg-[#37c4b2] px-5 py-3 text-white shadow-md"
+              >
+                <Calendar className="w-5 h-5 text-white" />
+                Book Appointment
+              </Link>
             </div>
           </motion.div>
         )}
