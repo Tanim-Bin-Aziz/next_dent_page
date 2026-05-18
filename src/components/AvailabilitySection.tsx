@@ -107,7 +107,6 @@ export function AvailabilitySection() {
   );
 }
 
-/* Reusable Contact Card */
 function ContactCard({
   icon,
   title,
