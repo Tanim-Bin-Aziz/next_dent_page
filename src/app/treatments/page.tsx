@@ -79,7 +79,7 @@ const treatments = [
 
 export default function TreatmentPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-white p-4 md:p-10">
+    <div className="min-h-screen bg-white p-4 md:p-10">
       <h1 className="text-3xl md:text-5xl font-bold text-center mb-10">
         Treatment Plans
       </h1>

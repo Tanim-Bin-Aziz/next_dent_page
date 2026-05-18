@@ -112,7 +112,7 @@ const DoctorsSection = () => {
               "
             >
               {/* Image */}
-              <div className="relative h-[220px] overflow-hidden">
+              <div className="relative h-55 overflow-hidden">
                 <Image
                   src={doctor.image}
                   alt={doctor.name}
@@ -121,7 +121,7 @@ const DoctorsSection = () => {
                 />
 
                 {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+                <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent"></div>
 
                 {/* Experience */}
                 <div className="absolute top-3 right-3 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-medium text-white backdrop-blur-xl">
@@ -194,7 +194,7 @@ const DoctorsSection = () => {
               items-center
               gap-2
               rounded-full
-              bg-gradient-to-r
+              bg-linear-to-r
               from-cyan-500
               to-blue-500
               px-6
