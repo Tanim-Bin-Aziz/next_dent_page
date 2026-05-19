@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -13,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="bg-linear-to-r from-[#ffffff]">
+    <html lang="en" className={cn("bg-linear-to-r from-[#ffffff]", "font-sans", geist.variable)}>
       <body className="min-h-full flex flex-col">
         <Navbar />
         <div className="pt-20">{children}</div>

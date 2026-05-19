@@ -105,8 +105,7 @@ const Navbar = () => {
                 href="/contact"
                 className="flex items-center gap-2 rounded-full bg-[#37c4b2] px-6 py-3 text-white shadow-md hover:shadow-lg transition"
               >
-                <Calendar className="w-4 h-4 text-white" />
-                Book
+                Login
               </Link>
             </div>
 
