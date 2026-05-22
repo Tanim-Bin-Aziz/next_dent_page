@@ -2,21 +2,77 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Menu, X, Calendar } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Menu, X, LogOut, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { createClient } from "@/lib/supabase/client";
 
 const Navbar = () => {
   const pathname = usePathname();
+  const router = useRouter();
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // ─── Auth state ───────────────────────────────────────────
+  useEffect(() => {
+    const supabase = createClient();
+
+    const fetchProfile = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        setUserName(null);
+        setUserRole(null);
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("name, role")
+        .eq("id", user.id)
+        .single();
+
+      if (profile) {
+        setUserName(profile.name);
+        setUserRole(profile.role);
+      }
+    };
+
+    fetchProfile();
+
+    // realtime auth change (login/logout করলে auto update)
+    const { data: listener } = supabase.auth.onAuthStateChange(() => {
+      fetchProfile();
+    });
+
+    return () => listener.subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    setUserName(null);
+    setUserRole(null);
+    router.push("/login");
+  };
+
+  const getDashboardLink = () => {
+    if (userRole === "admin") return "/admin/dashboard";
+    if (userRole === "doctor") return "/doctor/dashboard";
+    return "/patient/dashboard";
+  };
+
+  // ─────────────────────────────────────────────────────────
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -34,7 +90,6 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Navbar */}
       <motion.nav
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -42,10 +97,7 @@ const Navbar = () => {
       >
         <div
           className={`
-            rounded-[28px]
-            border border-black/10
-            backdrop-blur-2xl
-            shadow-lg
+            rounded-[28px] border border-black/10 backdrop-blur-2xl shadow-lg
             transition-all duration-500
             ${
               isScrolled
@@ -66,7 +118,6 @@ const Navbar = () => {
             <div className="hidden md:flex items-center gap-8">
               {navLinks.map((link) => {
                 const isHash = link.path.startsWith("#");
-
                 return isHash ? (
                   <button
                     key={link.name}
@@ -76,9 +127,7 @@ const Navbar = () => {
                     className="relative text-sm font-medium text-black/70 hover:text-[#37c4b2] transition group"
                   >
                     {link.name}
-
-                    {/* UNDERLINE */}
-                    <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-[#37c4b2] rounded-full transition-all duration-300 group-hover:w-full"></span>
+                    <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-[#37c4b2] rounded-full transition-all duration-300 group-hover:w-full" />
                   </button>
                 ) : (
                   <Link
@@ -91,22 +140,41 @@ const Navbar = () => {
                     }`}
                   >
                     {link.name}
-
-                    {/* UNDERLINE */}
-                    <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-[#37c4b2] rounded-full transition-all duration-300 group-hover:w-full"></span>
+                    <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-[#37c4b2] rounded-full transition-all duration-300 group-hover:w-full" />
                   </Link>
                 );
               })}
             </div>
 
-            {/* CTA */}
+            {/* CTA — Desktop */}
             <div className="hidden md:flex items-center gap-3">
-              <Link
-                href="/contact"
-                className="flex items-center gap-2 rounded-full bg-[#37c4b2] px-6 py-3 text-white shadow-md hover:shadow-lg transition"
-              >
-                Login
-              </Link>
+              {userName ? (
+                // ── Logged in state ──
+                <div className="flex items-center gap-3">
+                  <Link
+                    href={getDashboardLink()}
+                    className="flex items-center gap-2 rounded-full bg-white/60 border border-black/10 px-4 py-2 text-sm font-medium text-black/70 hover:bg-white/80 transition"
+                  >
+                    <User className="w-4 h-4 text-[#37c4b2]" />
+                    {userName}
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 rounded-full bg-red-50 border border-red-200 px-4 py-2 text-sm font-medium text-red-500 hover:bg-red-100 transition"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                // ── Logged out state ──
+                <Link
+                  href="/login"
+                  className="flex items-center gap-2 rounded-full bg-[#37c4b2] px-6 py-3 text-white shadow-md hover:shadow-lg transition"
+                >
+                  Login
+                </Link>
+              )}
             </div>
 
             {/* Mobile Icon */}
@@ -128,31 +196,15 @@ const Navbar = () => {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{
-              opacity: 0,
-              y: -10,
-              backdropFilter: "blur(0px)",
-              backgroundColor: "rgba(255,255,255,0)",
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-              backdropFilter: "blur(20px)",
-              backgroundColor: "rgba(255,255,255,0.55)",
-            }}
-            exit={{
-              opacity: 0,
-              y: -10,
-              backdropFilter: "blur(0px)",
-              backgroundColor: "rgba(255,255,255,0)",
-            }}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.35, ease: "easeInOut" }}
-            className="fixed top-24 left-1/2 -translate-x-1/2 z-40 w-[92%] md:hidden rounded-[24px] border border-black/10 shadow-xl overflow-hidden"
+            className="fixed top-24 left-1/2 -translate-x-1/2 z-40 w-[92%] md:hidden rounded-[24px] border border-black/10 shadow-xl overflow-hidden bg-white/55 backdrop-blur-xl"
           >
             <div className="flex flex-col p-5 gap-2">
               {navLinks.map((link, i) => {
                 const isHash = link.path.startsWith("#");
-
                 return (
                   <motion.div
                     key={i}
@@ -182,13 +234,39 @@ const Navbar = () => {
                 );
               })}
 
-              <Link
-                href="/contact"
-                className="mt-3 flex items-center justify-center gap-2 rounded-full bg-[#37c4b2] px-5 py-3 text-white shadow-md"
-              >
-                <Calendar className="w-5 h-5 text-white" />
-                Book Appointment
-              </Link>
+              {/* Mobile — Auth section */}
+              <div className="mt-3 border-t border-black/10 pt-3 flex flex-col gap-2">
+                {userName ? (
+                  <>
+                    <Link
+                      href={getDashboardLink()}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-3 rounded-xl text-black/70 hover:bg-white/30 transition text-sm font-medium"
+                    >
+                      <User className="w-4 h-4 text-[#37c4b2]" />
+                      {userName} — Dashboard
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        handleLogout();
+                      }}
+                      className="flex items-center gap-2 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 transition text-sm font-medium"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    href="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 rounded-full bg-[#37c4b2] px-5 py-3 text-white shadow-md"
+                  >
+                    Login
+                  </Link>
+                )}
+              </div>
             </div>
           </motion.div>
         )}
