@@ -18,7 +18,6 @@ import { createDoctor } from "@/actions/doctor.actions";
 import { toast } from "sonner";
 import type { CreateDoctorInput } from "@/types/nextdent";
 
-// ✅ CreateDoctorInput-এর সঠিক field নাম: name (full_name নয়)
 const INITIAL: CreateDoctorInput = {
   name: "",
   email: "",
@@ -49,7 +48,6 @@ export function CreateDoctorDialog() {
     startTransition(async () => {
       try {
         const doctor = await createDoctor(form);
-        // ✅ name → profiles.name
         toast.success(`Doctor created: ${doctor.profiles.name}`);
         setOpen(false);
         setForm(INITIAL);

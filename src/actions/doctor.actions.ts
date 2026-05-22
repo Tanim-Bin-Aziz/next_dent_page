@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin"; // ✅ admin client
 import { revalidatePath } from "next/cache";
 import type {
   Doctor,
@@ -17,7 +17,7 @@ export async function getDoctors({
   page?: number;
   pageSize?: number;
 }): Promise<PaginatedResult<Doctor>> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   let query = supabase
     .from("doctors")
@@ -46,7 +46,7 @@ export async function getDoctors({
 }
 
 export async function createDoctor(input: CreateDoctorInput): Promise<Doctor> {
-  const supabase = await createClient();
+  const supabase = createAdminClient(); // ✅ service role key দরকার
 
   // Step 1: Auth user
   const { data: authData, error: authError } =
@@ -98,18 +98,21 @@ export async function createDoctor(input: CreateDoctorInput): Promise<Doctor> {
 }
 
 export async function softDeleteDoctor(id: string): Promise<void> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
+  // ✅ আগে profile_id নাও (softDeletePatient-এর মতো consistent)
   const { data: doctor } = await supabase
     .from("doctors")
     .select("profile_id")
     .eq("id", id)
     .single();
 
-  await supabase
+  const { error } = await supabase
     .from("doctors")
     .update({ deleted_at: new Date().toISOString() })
     .eq("id", id);
+
+  if (error) throw new Error(error.message);
 
   if (doctor) {
     await supabase

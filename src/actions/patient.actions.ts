@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import type {
   Patient,
@@ -19,10 +19,8 @@ export async function getPatients({
   page?: number;
   pageSize?: number;
 }): Promise<PaginatedResult<Patient>> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
-  // ✅ profiles!patients_profile_id_fkey — foreign key explicitly বলে দেওয়া
-  // কারণ patients table-এ profile_id ও created_by দুটোই profiles কে reference করে
   let query = supabase
     .from("patients")
     .select("*, profiles!patients_profile_id_fkey(*)", { count: "exact" })
@@ -53,9 +51,8 @@ export async function getPatients({
 export async function getPatientById(
   id: string,
 ): Promise<Patient & { xrays: XRay[] }> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
-  // ✅ এখানেও same fix
   const { data, error } = await supabase
     .from("patients")
     .select("*, profiles!patients_profile_id_fkey(*), xrays(*)")
@@ -70,7 +67,7 @@ export async function getPatientById(
 export async function createPatient(
   input: CreatePatientInput,
 ): Promise<Patient> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const internalEmail = `${input.phone}@nextdent.internal`;
   const defaultPassword = `ND@${input.phone}`;
@@ -111,7 +108,6 @@ export async function createPatient(
       father_or_husband: input.father_or_husband || null,
       referred_by: input.referred_by || null,
     })
-    // ✅ এখানেও fix
     .select("*, profiles!patients_profile_id_fkey(*)")
     .single();
 
@@ -125,7 +121,14 @@ export async function createPatient(
 }
 
 export async function softDeletePatient(id: string): Promise<void> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
+
+  // ✅ আগে profile_id নাও, তারপর delete করো
+  const { data: patient } = await supabase
+    .from("patients")
+    .select("profile_id")
+    .eq("id", id)
+    .single();
 
   const { error } = await supabase
     .from("patients")
@@ -133,12 +136,6 @@ export async function softDeletePatient(id: string): Promise<void> {
     .eq("id", id);
 
   if (error) throw new Error(error.message);
-
-  const { data: patient } = await supabase
-    .from("patients")
-    .select("profile_id")
-    .eq("id", id)
-    .single();
 
   if (patient) {
     await supabase
