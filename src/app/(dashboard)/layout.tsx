@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, Stethoscope, LogOut } from "lucide-react";
+import {
+  LayoutDashboard,
+  Users,
+  Stethoscope,
+  LogOut,
+  CalendarDays,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -11,6 +17,7 @@ const NAV = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/patients", label: "Patients", icon: Users },
   { href: "/admin/doctors", label: "Doctors", icon: Stethoscope },
+  { href: "/admin/appointments", label: "Appointments", icon: CalendarDays },
 ];
 
 export default function DashboardLayout({
