@@ -6,7 +6,7 @@ import { Upload, X, FileImage, Loader2, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { uploadXRay } from "@/actions/xray.actions";
+import { uploadXRay } from "@/actions/xray.ts";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
