@@ -10,10 +10,10 @@ export async function saveXrayRecord(formData: {
   label?: string;
   treatmentPlanId?: string;
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
-  } = await (await supabase).auth.getUser();
+  } = await supabase.auth.getUser();
   if (!user) throw new Error("Not authenticated");
 
   const admin = createAdminClient();
