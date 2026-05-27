@@ -1,3 +1,5 @@
-const treatments = () =>{}
-return;
-export default treatments;
+const Treatments = () => {
+  return <div>Treatments Page</div>;
+};
+
+export default Treatments;
