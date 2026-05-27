@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
-export async function saveXrayRecord(formData: {
+export async function uploadXRay(formData: {
   patient_id: string;
   file_url: string;
   label?: string;
@@ -34,6 +34,9 @@ export async function saveXrayRecord(formData: {
   }
   return data;
 }
+
+// alias for backward compat
+export const saveXrayRecord = uploadXRay;
 
 export async function deleteXray(id: string, treatmentPlanId?: string) {
   const supabase = createAdminClient();
