@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 export async function uploadXRay(
   patientId: string,
   file: File,
-  label?: string
+  label?: string,
 ) {
   const supabase = await createClient();
   const {
@@ -34,7 +34,6 @@ export async function uploadXRay(
     .from("xrays")
     .insert({
       patient_id: patientId,
-      path,
       file_url: urlData.publicUrl,
       label: label ?? null,
       uploaded_by: user.id,
