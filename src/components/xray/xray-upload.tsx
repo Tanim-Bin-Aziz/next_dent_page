@@ -18,6 +18,7 @@ const ACCEPTED = [
   "image/dicom",
   "image/tiff",
 ];
+
 const MAX_SIZE_MB = 20;
 
 interface XRayUploadProps {
@@ -88,6 +89,7 @@ export function XRayUpload({ patientId, onSuccess }: XRayUploadProps) {
 
       for (let i = 0; i < updated.length; i++) {
         if (updated[i].status !== "pending") continue;
+
         updated[i] = { ...updated[i], status: "uploading" };
         setFiles([...updated]);
 
@@ -97,12 +99,13 @@ export function XRayUpload({ patientId, onSuccess }: XRayUploadProps) {
             updated[i].file,
             updated[i].notes || undefined,
           );
+
           updated[i] = { ...updated[i], status: "done" };
         } catch (err: any) {
           updated[i] = {
             ...updated[i],
             status: "error",
-            errorMsg: err?.message,
+            errorMsg: err?.message ?? "Upload failed",
           };
         }
 
@@ -110,6 +113,7 @@ export function XRayUpload({ patientId, onSuccess }: XRayUploadProps) {
       }
 
       const allDone = updated.every((f) => f.status === "done");
+
       if (allDone) {
         toast.success("All X-rays uploaded!");
         setTimeout(() => {
@@ -143,12 +147,14 @@ export function XRayUpload({ patientId, onSuccess }: XRayUploadProps) {
         )}
       >
         <Upload className="h-8 w-8 text-muted-foreground" />
+
         <div>
           <p className="font-medium text-sm">Drag & drop X-rays here</p>
           <p className="text-xs text-muted-foreground mt-0.5">
             or click to browse — JPG, PNG, DICOM, TIFF up to {MAX_SIZE_MB}MB
           </p>
         </div>
+
         <input
           ref={inputRef}
           type="file"
@@ -178,6 +184,8 @@ export function XRayUpload({ patientId, onSuccess }: XRayUploadProps) {
                   <Image
                     src={f.url}
                     alt={f.file.name}
+                    width={64}
+                    height={64}
                     className="h-full w-full object-cover"
                   />
                 ) : (
@@ -196,6 +204,7 @@ export function XRayUpload({ patientId, onSuccess }: XRayUploadProps) {
                       {(f.file.size / 1024 / 1024).toFixed(2)} MB
                     </p>
                   </div>
+
                   <div className="flex items-center gap-1 shrink-0">
                     {f.status === "uploading" && (
                       <Loader2 className="h-4 w-4 animate-spin text-primary" />
@@ -244,7 +253,8 @@ export function XRayUpload({ patientId, onSuccess }: XRayUploadProps) {
           >
             {isPending ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Uploading…
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Uploading…
               </>
             ) : (
               `Upload ${pendingCount} X-ray${pendingCount !== 1 ? "s" : ""}`

@@ -5,9 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { XRayUpload } from "@/components/xray/xray-upload";
+import { XRayImage } from "@/components/xray/xray-image";
 import { ArrowLeft, User, ScanLine } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -34,11 +34,11 @@ function InfoRow({ label, value }: { label: string; value?: string | null }) {
 }
 
 export default async function PatientProfilePage({ params }: Props) {
-  const { id } = await params; // ✅ await করা হলো
+  const { id } = await params;
 
   let patient;
   try {
-    patient = await getPatientById(id); // ✅ params.id → id
+    patient = await getPatientById(id);
   } catch {
     notFound();
   }
@@ -187,16 +187,9 @@ export default async function PatientProfilePage({ params }: Props) {
                       className="group rounded-lg border overflow-hidden hover:border-primary/50 transition-colors"
                     >
                       <div className="aspect-square bg-muted flex items-center justify-center overflow-hidden">
-                        <Image
+                        <XRayImage
                           src={xray.file_url}
                           alt={xray.label ?? "X-Ray"}
-                          width={200}
-                          height={200}
-                          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-200"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display =
-                              "none";
-                          }}
                         />
                       </div>
                       <div className="p-2">
