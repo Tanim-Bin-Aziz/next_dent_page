@@ -47,7 +47,6 @@ export async function getPatients({
     totalPages: Math.ceil((count ?? 0) / pageSize),
   };
 }
-
 export async function getPatientById(
   id: string,
 ): Promise<Patient & { xrays: XRay[] }> {
@@ -55,13 +54,21 @@ export async function getPatientById(
 
   const { data, error } = await supabase
     .from("patients")
-    .select("*, profiles!patients_profile_id_fkey(*), xrays(*)")
+    .select("*, profiles!patients_profile_id_fkey(*)")
     .eq("id", id)
     .is("deleted_at", null)
     .single();
 
   if (error) throw new Error(error.message);
-  return data as any;
+
+  // xrays আলাদাভাবে fetch করো
+  const { data: xrays } = await supabase
+    .from("xrays")
+    .select("*")
+    .eq("patient_id", id)
+    .order("created_at", { ascending: false });
+
+  return { ...data, xrays: xrays ?? [] } as any;
 }
 
 export async function createPatient(
