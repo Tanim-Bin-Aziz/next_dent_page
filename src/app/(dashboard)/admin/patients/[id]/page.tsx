@@ -10,7 +10,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 const BLOOD_COLOR: Record<string, string> = {
@@ -34,14 +34,15 @@ function InfoRow({ label, value }: { label: string; value?: string | null }) {
 }
 
 export default async function PatientProfilePage({ params }: Props) {
+  const { id } = await params; // ✅ await করা হলো
+
   let patient;
   try {
-    patient = await getPatientById(params.id);
+    patient = await getPatientById(id); // ✅ params.id → id
   } catch {
     notFound();
   }
 
-  // ✅ profiles থেকে name নেওয়া হচ্ছে
   const initials = patient.profiles.name
     .split(" ")
     .slice(0, 2)
@@ -49,7 +50,6 @@ export default async function PatientProfilePage({ params }: Props) {
     .join("")
     .toUpperCase();
 
-  // ✅ dob patient table-এ আছে, profiles-এ নেই
   const age = patient.dob
     ? Math.floor(
         (Date.now() - new Date(patient.dob).getTime()) /
@@ -78,9 +78,7 @@ export default async function PatientProfilePage({ params }: Props) {
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 flex-wrap">
-            {/* ✅ name → profiles.name */}
             <h1 className="text-xl font-bold">{patient.profiles.name}</h1>
-            {/* ✅ patient_uid → profiles.patient_uid */}
             <Badge variant="outline" className="font-mono text-xs">
               {patient.profiles.patient_uid}
             </Badge>
@@ -92,7 +90,6 @@ export default async function PatientProfilePage({ params }: Props) {
               </span>
             )}
           </div>
-          {/* ✅ phone → profiles.phone */}
           <p className="text-sm text-muted-foreground mt-1">
             {patient.profiles.phone}
           </p>
@@ -130,7 +127,6 @@ export default async function PatientProfilePage({ params }: Props) {
             <div>
               <h2 className="font-semibold mb-4">Personal Information</h2>
               <div className="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-3">
-                {/* ✅ সব field সঠিক জায়গা থেকে নেওয়া */}
                 <InfoRow label="Full Name" value={patient.profiles.name} />
                 <InfoRow label="Phone" value={patient.profiles.phone} />
                 <InfoRow
@@ -163,20 +159,16 @@ export default async function PatientProfilePage({ params }: Props) {
                 <InfoRow label="Referred By" value={patient.referred_by} />
               </div>
             </div>
-
-            {/* ✅ notes patients table-এ নেই, তাই এই section সরিয়ে দেওয়া হয়েছে */}
           </div>
         </TabsContent>
 
         {/* X-Rays Tab */}
         <TabsContent value="xrays" className="mt-4 space-y-6">
-          {/* Upload */}
           <div className="rounded-xl border bg-card p-6">
             <h2 className="font-semibold mb-4">Upload X-Rays</h2>
             <XRayUpload patientId={patient.id} />
           </div>
 
-          {/* Existing X-Rays */}
           {patient.xrays?.filter((x) => !x.deleted_at).length > 0 && (
             <div className="rounded-xl border bg-card p-6">
               <h2 className="font-semibold mb-4">
@@ -197,8 +189,9 @@ export default async function PatientProfilePage({ params }: Props) {
                       <div className="aspect-square bg-muted flex items-center justify-center overflow-hidden">
                         <Image
                           src={xray.file_url}
-                          // ✅ XRay type-এ file_name নেই, label আছে
                           alt={xray.label ?? "X-Ray"}
+                          width={200}
+                          height={200}
                           className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-200"
                           onError={(e) => {
                             (e.target as HTMLImageElement).style.display =
@@ -208,7 +201,6 @@ export default async function PatientProfilePage({ params }: Props) {
                       </div>
                       <div className="p-2">
                         <p className="text-xs font-medium truncate">
-                          {/* ✅ file_name → label */}
                           {xray.label ?? "X-Ray"}
                         </p>
                         <p className="text-xs text-muted-foreground">
