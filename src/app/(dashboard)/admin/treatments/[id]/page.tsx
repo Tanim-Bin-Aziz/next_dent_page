@@ -1,5 +1,3 @@
-const Treatments = () => {
-  return <div>Treatments Page</div>;
-};
-
-export default Treatments;
+export default function Page() {
+  return <div>Treatment Details</div>;
+}
