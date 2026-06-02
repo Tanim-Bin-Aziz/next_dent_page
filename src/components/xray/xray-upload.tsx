@@ -6,12 +6,7 @@ import { Upload, X, FileImage, Loader2, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-<<<<<<< HEAD
 import { uploadXRay } from "@/actions/xray";
-=======
-import { saveXrayRecord } from "@/actions/xray";
-import { createClient } from "@/lib/supabase/client";
->>>>>>> b445d4e (appointment updated)
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
