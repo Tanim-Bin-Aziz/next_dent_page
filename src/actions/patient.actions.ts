@@ -14,10 +14,12 @@ export async function getPatients({
   search = "",
   page = 1,
   pageSize = 10,
+  sort = "newest",
 }: {
   search?: string;
   page?: number;
   pageSize?: number;
+  sort?: "newest" | "oldest";
 }): Promise<PaginatedResult<Patient>> {
   const supabase = createAdminClient();
 
@@ -25,7 +27,7 @@ export async function getPatients({
     .from("patients")
     .select("*, profiles!patients_profile_id_fkey(*)", { count: "exact" })
     .is("deleted_at", null)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: sort === "oldest" });
 
   if (search.trim()) {
     query = query.or(

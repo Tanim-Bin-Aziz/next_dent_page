@@ -2,12 +2,20 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Stethoscope, LogOut } from "lucide-react";
+import {
+  LayoutDashboard,
+  Stethoscope,
+  CalendarDays,
+  Users,
+  LogOut,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 
 const NAV = [
   { href: "/doctor/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/doctor/appointments", label: "Appointments", icon: CalendarDays },
+  { href: "/doctor/patients", label: "Patients", icon: Users },
   { href: "/doctor/treatments", label: "Treatments", icon: Stethoscope },
 ];
 
